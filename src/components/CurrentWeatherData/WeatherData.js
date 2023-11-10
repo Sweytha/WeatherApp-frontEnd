@@ -12,8 +12,7 @@ import DisplayWeatherData from "./DisplayWeatherData";
 // Import the getWeatherDataApi function from the ApiUtil file
 import { getWeatherDataApi } from "../../util/ApiUtil";
 
-//import toast
-import { toast } from "react-hot-toast";
+import TokenExpirationPage from "../TokenExpirationPage/TokenExpirationPage";
 
 const WeatherData = ({ currentUser }) => {
   // - data: used to store weather data fetched from the API
@@ -49,7 +48,6 @@ const WeatherData = ({ currentUser }) => {
 
     // if input value is empty
     if (input.value === "") {
-      toast("Please enter a city name");
       // set animate to true
       setAnimate(true);
       // after 500 ms set animate to false
@@ -99,6 +97,11 @@ const WeatherData = ({ currentUser }) => {
     return () => clearTimeout(timer);
   }, [errorMsg]);
 
+  //if the token has expired render TokenExpirationPage
+  if (tokenExpired) {
+    return <TokenExpirationPage />;
+  }
+
 
   // if data is false show the loading icon
   if (!data) {
@@ -110,6 +113,7 @@ const WeatherData = ({ currentUser }) => {
       </div>
     );
   }
+
 
   return (
     <div className="w-full min-h-screen bg-gradientBg bg-no-repeat bg-cover bg-center flex flex-col items-center justify-center px-4 lg:px-0">
