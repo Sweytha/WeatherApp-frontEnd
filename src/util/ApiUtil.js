@@ -154,19 +154,21 @@ export const getWeatherDataApi = async (token, location, save) => {
 
 // API to fetch all weather data searched by the user
 export const getHistoryWeatherDataApi = async (token) => {
-    let response = undefined; // Initialize response variable to undefined
+    let response = frameResponse(); // Initialize response variable to undefined
     try {
         const url = `${API_BASE_URL}/weathers`; // API endpoint to fetch weather data
         const headers = { headers: { Authorization: frameToken(token) } }; // Pass token in the request headers
         const apiResponse = await axios.get(url, headers); // Make API call to fetch weather data
         if (apiResponse.status === 200) { // Check if response status is success
-            response = apiResponse.data; // If successful, set the response variable to the data received
+            // If successful, set the response variable to the data received
+            response = frameResponse(1, apiResponse.data);
         }
     } catch (err) { // Catch any errors that may occur during the API call
         if (err.response) {
-            response = err; // If there is a response, set the response variable to the error object
+            response = frameResponse(0, err.response.data.message);
         }
         console.log(err); // Log the error in the console
+
     } finally { // Regardless of success or failure, return the response variable
         return response;
     }

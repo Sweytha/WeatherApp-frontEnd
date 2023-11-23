@@ -9,6 +9,9 @@ import NoHistoryWeatherPresent from "./NoHistoryWeatherPresent";
 
 import LoadingIndicator from "../LoadingIndicator/LoadingIndicator";
 
+//import toast
+import { toast } from "react-hot-toast";
+
 import TokenExpirationPage from "../TokenExpirationPage/TokenExpirationPage";
 
 const HistoryWeatherData = ({ currentUser }) => {
@@ -26,27 +29,30 @@ const HistoryWeatherData = ({ currentUser }) => {
     getMyResults();
   }, []);
 
-  //function to get the history weather data from the API
+
   const getMyResults = async () => {
     setLoading(true);
+
     const apiResponse = await getHistoryWeatherDataApi(currentUser.token);
-    //if there is history weather data available, update the state variables and hide the loading indicator
-    if (apiResponse && apiResponse.length > 0) {
-      setResults(apiResponse);
+
+    if (apiResponse.status === 1 && apiResponse.payLoad.length > 0) {
+      setResults(apiResponse.payLoad);
       setData(true);
       setLoading(false);
-    }
-    //if there is no history weather data available, update the state variables and hide the loading indicator
-    else if (apiResponse && apiResponse.length === 0) {
+    } else if (apiResponse.status === 1 && apiResponse.payLoad.length === 0) {
       setData(false);
       setLoading(false);
-    }
-    //if the authentication token has expired, update the state variables and hide the loading indicator
-    else if (apiResponse.response.data.httpStatusCode === 401) {
+    } else if (apiResponse.status === 0 && apiResponse.payLoad === "Token has Expired") {
+      // Check for token expiration
       setTokenExpired(true);
       setLoading(false);
+    } else {
+      // Handle other cases, errors from the API
+      toast(apiResponse.payLoad);
     }
+
   };
+
 
   //show the loading indicator if the data is being loaded
   if (loading) {
@@ -59,7 +65,7 @@ const HistoryWeatherData = ({ currentUser }) => {
   }
 
   //if there is no history weather data available, render the NoHistoryWeatherPresent component
-  if (data == false) {
+  if (data === false) {
     return (
       <div className="flex items-center justify-center">
         <NoHistoryWeatherPresent />;
